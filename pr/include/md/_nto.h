@@ -11,7 +11,15 @@
 */
 #define PR_LINKER_ARCH      "nto"
 #define _PR_SI_SYSNAME      "NTO"
-#define _PR_SI_ARCHITECTURE "x86"
+#if defined(__x86_64__)
+#define _PR_SI_ARCHITECTURE "x86-64"
+#elif defined(__aarch64__)
+#define _PR_SI_ARCHITECTURE "aarch64"
+#else
+#error "Unknown CPU architecture"
+#endif
+
+
 #define PR_DLL_SUFFIX       ".so"
 
 #define _PR_VMBASE      0x30000000
@@ -24,12 +32,12 @@
 #define HAVE_WEAK_IO_SYMBOLS
 #endif
 
-#undef  _PR_POLL_AVAILABLE
-#undef  _PR_USE_POLL
+#define  _PR_POLL_AVAILABLE
+#define  _PR_USE_POLL
 #define _PR_HAVE_SOCKADDR_LEN
 #undef  HAVE_BSD_FLOCK
 #define HAVE_FCNTL_FILE_LOCKING
-#define _PR_NO_LARGE_FILES
+#define _PR_HAVE_LARGE_OFF_T
 #define _PR_STAT_HAS_ONLY_ST_ATIME
 #define PR_HAVE_POSIX_NAMED_SHARED_MEMORY
 #define _PR_HAVE_POSIX_SEMAPHORES
@@ -166,6 +174,8 @@ struct _MDCPU {
 #define _MD_INIT_IO()
 #define _MD_IOQ_LOCK()
 #define _MD_IOQ_UNLOCK()
+
+extern void _MD_EarlyInit(void);
 
 #define _MD_INTERVAL_USE_GTOD
 #define _MD_EARLY_INIT          _MD_EarlyInit

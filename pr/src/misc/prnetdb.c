@@ -83,6 +83,13 @@ PRLock* _pr_dnsLock = NULL;
 #  define _PR_HAVE_5_ARG_GETPROTO_R
 #endif
 
+#if defined(NTO)
+#  define _PR_HAVE_GETPROTO_R
+#  define _PR_HAVE_5_ARG_GETPROTO_R
+#  define _PR_HAVE_GETPROTO_R_INT
+#  define _PR_HAVE_GETHOST_R_INT
+#endif
+
 #if !defined(_PR_HAVE_GETPROTO_R)
         PRLock* _getproto_lock = NULL;
 #endif
@@ -596,7 +603,6 @@ static PRStatus CopyProtoent(struct protoent* from, char* buf, PRIntn bufsize,
  * #################################################################
  */
 #if defined(_PR_HAVE_GETHOST_R_INT)
-
 #  define GETHOSTBYNAME(name) \
     (gethostbyname_r(name, &tmphe, tmpbuf, bufsize, &h, &h_err), h)
 #  define GETHOSTBYNAME2(name, af) \
@@ -605,7 +611,6 @@ static PRStatus CopyProtoent(struct protoent* from, char* buf, PRIntn bufsize,
     (gethostbyaddr_r(addr, addrlen, af, &tmphe, tmpbuf, bufsize, &h, &h_err), h)
 
 #elif defined(_PR_HAVE_GETHOST_R_POINTER)
-
 #  define GETHOSTBYNAME(name) \
     gethostbyname_r(name, &tmphe, tmpbuf, bufsize, &h_err)
 #  define GETHOSTBYNAME2(name, af) \
@@ -1169,7 +1174,7 @@ PR_GetProtoByName(const char* name, char* buffer, PRInt32 buflen,
     PR_SetError(PR_DIRECTORY_LOOKUP_ERROR, _MD_ERRNO());
     return PR_FAILURE;
   }
-#elif defined(_PR_HAVE_GETPROTO_R_INT)
+#elif defined(_PR_HAVE_GETPROTO_R_INT) && !defined(_PR_HAVE_5_ARG_GETPROTO_R)
   /*
   ** The buffer needs to be zero'd, and it should be
   ** at least the size of a struct protoent_data.
@@ -1245,7 +1250,7 @@ PR_GetProtoByNumber(PRInt32 number, char* buffer, PRInt32 buflen,
     return PR_FAILURE;
   }
 
-#elif defined(_PR_HAVE_GETPROTO_R_INT)
+#elif defined(_PR_HAVE_GETPROTO_R_INT) && !defined(_PR_HAVE_5_ARG_GETPROTO_R)
   /*
   ** The buffer needs to be zero'd for these OS's.
   */

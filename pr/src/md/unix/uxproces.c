@@ -23,6 +23,10 @@
 PR_IMPORT_DATA(char**) environ;
 #endif
 
+#if defined(NTO)
+#  include <spawn.h>
+#endif
+
 /*
  * HP-UX 9 doesn't have the SA_RESTART flag.
  */
